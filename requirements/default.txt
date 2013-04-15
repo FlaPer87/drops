@@ -1,0 +1,4 @@
+oslo.config
+redis
+
+-e git://github.com/xk0/SmartRPyC.git#egg=smartrpyc

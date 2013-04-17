@@ -1,3 +1,6 @@
+import functools
+
+
 def lazy_property(fn):
     attr_name = '_lazy_' + fn.__name__
 
@@ -13,3 +16,15 @@ def lazy_property(fn):
         delattr(self, attr_name)
 
     return property(fget=getter, fset=setter, fdel=deleter, doc=fn.__doc__)
+
+
+def memoize(func):
+
+    cache = {}
+
+    @functools.wraps(func)
+    def wrap(*args):
+        if args not in cache:
+            cache[args] = func(*args)
+        return cache[args]
+    return wrap

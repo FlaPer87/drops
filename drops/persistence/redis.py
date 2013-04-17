@@ -1,11 +1,10 @@
 from __future__ import absolute_import
 
-import random
-
 import redis
 
-from drops.registers import base
-from drops.common import config, decorators
+from drops.common import config
+from drops.common import decorators
+from drops.persistence import base
 
 OPTIONS = {
     'port': (6379, 'Redis Port'),
@@ -17,7 +16,7 @@ prj = config.project("drops").from_options()
 cfg = config.namespace('redis').from_options(**OPTIONS)
 
 
-class Redis(base.RemoteMethods):
+class Driver(base.StoreBase):
 
     @decorators.lazy_property
     def redis(self):
@@ -26,9 +25,14 @@ class Redis(base.RemoteMethods):
                                     db=cfg.db)
         return redis.Redis(connection_pool=pool)
 
-    def remote_store(self, name, method):
-        self.redis.set("commands:%s:%s" % (name, prj.listen), prj.listen)
+    def _key(self, col, uuid):
+        return "%s:%s" % (col, uuid)
 
-    def remote_lookup(self, name):
-        keys = self.redis.keys("commands:%s:*" % name)
-        return self.redis.get(random.choice(keys))
+    def get(self, col, uuid, **kwargs):
+        return self.redis.hmget(self._key(col, uuid))
+
+    def upsert(self, col, uuid, **kwargs):
+        self.redis.hmset(self._key(col, uuid), kwargs)
+
+    def delete(self, col, uuid, **kwargs):
+        pass

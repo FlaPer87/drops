@@ -18,8 +18,11 @@ class PersistenceMiddleware(base.ServerMiddlewareBase):
                 status = "received"
         except AttributeError:
             pass
+
+        raw = request.raw
+        tid = raw.setdefault("k", {}).setdefault("tid", request.id)
         msg = {
             "status": status,
             "msg": request.raw,
         }
-        self.driver.upsert("message", request.id, **msg)
+        self.driver.upsert("message", tid, **msg)

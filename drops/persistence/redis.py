@@ -1,28 +1,21 @@
 from __future__ import absolute_import
 
 import redis
+from oslo.config import cfg
 
-from drops.common import config
 from drops.common import decorators
 from drops.persistence import base
 
-OPTIONS = {
-    'port': (6379, 'Redis Port'),
-    'db': (0, 'Redis Database Index'),
-    'host': ('127.0.0.1', 'Redis Host'),
-}
-
-prj = config.project("drops").from_options()
-cfg = config.namespace('redis').from_options(**OPTIONS)
+CONF = cfg.CONF
 
 
 class Driver(base.StoreBase):
 
     @decorators.lazy_property
     def _redis(self):
-        pool = redis.ConnectionPool(host=cfg.host,
-                                    port=cfg.port,
-                                    db=cfg.db)
+        pool = redis.ConnectionPool(host=CONF.host,
+                                    port=CONF.port,
+                                    db=CONF.db)
         return redis.Redis(connection_pool=pool)
 
     def _key(self, col, uuid):

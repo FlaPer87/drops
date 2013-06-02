@@ -1,11 +1,14 @@
-from drops.common import config, importutils
+from oslo.config import cfg
+
+from drops.common import importutils
 
 
-OPTIONS = {
-    'register': 'drops.registers.redis.Redis',
-}
+OPTIONS = [
+    cfg.StrOpt('register', default='drops.registers.redis.Redis')
+]
 
-cfg = config.project('drops').from_options(**OPTIONS)
+CONF = cfg.CONF
+CONF.register_opts(OPTIONS)
 
 REGISTER = None
 
@@ -13,5 +16,5 @@ REGISTER = None
 def get_register():
     global REGISTER
     if not REGISTER:
-        REGISTER = importutils.import_object(cfg.register)
+        REGISTER = importutils.import_object(CONF.register)
     return REGISTER

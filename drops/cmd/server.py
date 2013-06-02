@@ -1,17 +1,20 @@
 import sys
 
+from oslo.config import cfg
 from stevedore import driver
 
-from drops.common import config
 from drops.scheduler import rpc
 
-OPTIONS = {
-    'listen': ("tcp://127.0.0.1:5555", "Default Listen"),
-    'workers': ([], "Enabled workers"),
-}
+OPTIONS = [
+    cfg.StrOpt('listen',
+               default='tcp://127.0.0.1:5555',
+               help="Default Listen"),
+    cfg.ListOpt('workers', default=[],
+               help="Default Listen")
+]
 
-cfg = config.project('drops')
-conf = cfg.from_options(**OPTIONS)
+CONF = cfg.CONF
+CONF.register_cli_opts(OPTIONS)
 
 
 def fail(returncode, e):
@@ -21,13 +24,13 @@ def fail(returncode, e):
 
 def run():
     try:
-        cfg.load(args=sys.argv[1:])
+        CONF(args=sys.argv[1:])
 
-        for worker in conf.workers:
+        for worker in CONF.workers:
             driver.DriverManager('drops.workers', worker)
 
         server = rpc.Commander()
-        server.bind(conf.listen)
+        server.bind(CONF.listen)
         server.run()
 
     except KeyboardInterrupt:

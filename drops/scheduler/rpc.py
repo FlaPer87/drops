@@ -1,16 +1,18 @@
+from oslo.config import cfg
 from smartrpyc import server
 from stevedore import driver
 
-from drops.common import config
 from drops import registers
 
 
-OPTIONS = {
-    'scheduler_middleware': (['persistence'], 'Default Middlewares'),
-}
+OPTIONS = [
+    cfg.ListOpt('scheduler_middleware',
+                default=['persistence'],
+                help='Default Middlewares'),
+]
 
-conf = config.project("drops")
-prj = conf.from_options(**OPTIONS)
+CONF = cfg.CONF
+CONF.register_opts(OPTIONS)
 
 
 class Commander(server.Server):
@@ -23,6 +25,6 @@ class Commander(server.Server):
         self._load_middleware()
 
     def _load_middleware(self):
-        for mid in prj.scheduler_middleware:
+        for mid in CONF.scheduler_middleware:
             driver.DriverManager('drops.middleware', mid,
                                  invoke_on_load=True)

@@ -1,18 +1,21 @@
 import logging
 
+from oslo.config import cfg
 from smartrpyc.client import pirate
 from smartrpyc.server import base
 
-from drops.common import config
 
+OPTIONS = [
+    cfg.IntOpt('worker_retries',
+               default=3,
+               help='Retries per worker'),
+    cfg.IntOpt('worker_timeout',
+               default=1000,
+               help='Timeout per worker'),
+]
 
-OPTIONS = {
-    'worker_retries': (3, "Retries per worker"),
-    'worker_timeout': (1000, 'Timeout per worker'),
-}
-
-cfg = config.namespace('registers:default').from_options(**OPTIONS)
-
+CONF = cfg.CONF
+CONF.register_opts(OPTIONS)
 
 LOG = logging.getLogger(__name__)
 
@@ -41,8 +44,8 @@ class RemoteMethods(base.MethodsRegister):
         except KeyError:
             LOG.debug("Attempting to load remote method: %s" % name)
             remote = self.remote_lookup(name)
-            client = pirate.Lazy(retries=cfg.worker_retries,
-                                 timeout=cfg.worker_timeout,
+            client = pirate.Lazy(retries=CONF.worker_retries,
+                                 timeout=CONF.worker_timeout,
                                  address=remote)
             method = self.remotely(client, name)
         LOG.debug("Method %s found" % method)

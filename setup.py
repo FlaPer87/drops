@@ -77,7 +77,14 @@ setup(
         'Topic :: System :: Networking',
     ],
     entry_points={
-        'console_scripts':
-            ['drops-server = drops.bin.server:run']
+        'drops.middleware': [
+            'persistence = drops.scheduler.middleware.persistence:PersistenceMiddleware'
+        ],
+        'drops.workers': [
+            'console = drops.worker.console:Console'
+        ],
+        'console_scripts': [
+            'drops-server = drops.cmd.server:run'
+        ]
     }
 )

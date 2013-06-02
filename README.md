@@ -45,3 +45,5 @@ Things I don't like
 * The way worker's commands are registered, perhaps those methods could be dynamically registered using meta-classes.
 
 * Console worker is just an example
+
+* Registers backends should go into SmartRPyC, Should it?

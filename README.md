@@ -16,14 +16,15 @@ Create a virtual environment first, then:
 
 Start a few workers:
 
-   $ drops-server --listen 'tcp://127.0.0.1:5556' --workers drops.worker.console
+   $ drops-server --listen 'tcp://127.0.0.1:5556' --workers console
 
-   $ drops-server --listen 'tcp://127.0.0.1:5557' --workers drops.worker.console
+   $ drops-server --listen 'tcp://127.0.0.1:5557' --workers console
 
 Start main scheduler:
 
    $ drops-server # Will listen on 5555
 
+*NOTE:* Any instance can work as a scheduler, it'll first try to consume the request locally and then look for a remote worker in case it is not capable of finishing the job. That's why in the above example the main scheduler doesn't start any worker.
 
 Now, spawn some commands:
 

@@ -19,7 +19,7 @@ cfg = config.namespace('redis').from_options(**OPTIONS)
 class Driver(base.StoreBase):
 
     @decorators.lazy_property
-    def redis(self):
+    def _redis(self):
         pool = redis.ConnectionPool(host=cfg.host,
                                     port=cfg.port,
                                     db=cfg.db)
@@ -29,10 +29,10 @@ class Driver(base.StoreBase):
         return "%s:%s" % (col, uuid)
 
     def get(self, col, uuid, **kwargs):
-        return self.redis.hmget(self._key(col, uuid))
+        return self._redis.hmget(self._key(col, uuid))
 
     def upsert(self, col, uuid, **kwargs):
-        self.redis.hmset(self._key(col, uuid), kwargs)
+        self._redis.hmset(self._key(col, uuid), kwargs)
 
     def delete(self, col, uuid, **kwargs):
         pass

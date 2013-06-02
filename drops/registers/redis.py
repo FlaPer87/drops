@@ -20,15 +20,15 @@ cfg = config.namespace('redis').from_options(**OPTIONS)
 class Redis(base.RemoteMethods):
 
     @decorators.lazy_property
-    def redis(self):
+    def _redis(self):
         pool = redis.ConnectionPool(host=cfg.host,
                                     port=cfg.port,
                                     db=cfg.db)
         return redis.Redis(connection_pool=pool)
 
     def remote_store(self, name, method):
-        self.redis.set("commands:%s:%s" % (name, prj.listen), prj.listen)
+        self._redis.set("commands:%s:%s" % (name, prj.listen), prj.listen)
 
     def remote_lookup(self, name):
-        keys = self.redis.keys("commands:%s:*" % name)
-        return self.redis.get(random.choice(keys))
+        keys = self._redis.keys("commands:%s:*" % name)
+        return self._redis.get(random.choice(keys))

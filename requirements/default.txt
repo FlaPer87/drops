@@ -1,4 +1,5 @@
 oslo.config
 redis
+stevedore
 
 -e git://github.com/xk0/SmartRPyC.git#egg=smartrpyc

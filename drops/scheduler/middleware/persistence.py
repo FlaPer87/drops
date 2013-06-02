@@ -1,10 +1,10 @@
 from smartrpyc import client
-from smartrpyc.server import base
+from smartrpyc.server import middleware
 
 from drops import persistence as db
 
 
-class PersistenceMiddleware(base.ServerMiddlewareBase):
+class PersistenceMiddleware(middleware.ServerMiddlewareBase):
 
     def __init__(self, scheduler, *args, **kwargs):
         super(PersistenceMiddleware, self).__init__(*args, **kwargs)

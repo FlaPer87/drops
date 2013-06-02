@@ -1,20 +1,22 @@
 from oslo.config import cfg
-
-from drops.common import importutils
+from stevedore import driver
 
 
 OPTIONS = [
-    cfg.StrOpt('register', default='drops.registers.redis.Redis')
+    cfg.StrOpt('register', default='redis')
 ]
 
 CONF = cfg.CONF
 CONF.register_opts(OPTIONS)
 
-REGISTER = None
 
+def get_register(conf=None):
+    register = CONF.register
 
-def get_register():
-    global REGISTER
-    if not REGISTER:
-        REGISTER = importutils.import_object(CONF.register)
-    return REGISTER
+    if conf:
+        register = conf.register
+
+    instance = driver.DriverManager('drops.registers', register,
+                                    invoke_on_load=True,
+                                    invoke_args=[conf or CONF])
+    return instance.driver

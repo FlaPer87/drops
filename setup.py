@@ -80,6 +80,12 @@ setup(
         'drops.middleware': [
             'persistence = drops.scheduler.middleware.persistence:PersistenceMiddleware'
         ],
+        'drops.persistence': [
+            'redis = drops.persistence.redis:Driver'
+        ],
+        'drops.registers': [
+            'redis = drops.registers.redis:Redis'
+        ],
         'drops.workers': [
             'console = drops.worker.console:Console'
         ],

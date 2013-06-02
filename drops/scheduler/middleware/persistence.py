@@ -6,9 +6,10 @@ from drops import persistence as db
 
 class PersistenceMiddleware(base.ServerMiddlewareBase):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, scheduler, *args, **kwargs):
         super(PersistenceMiddleware, self).__init__(*args, **kwargs)
-        self.driver = db.get_driver()
+        self.scheduler = scheduler
+        self.driver = db.get_driver(self.scheduler.conf)
 
     def pre(self, request, method):
         status = "taken"

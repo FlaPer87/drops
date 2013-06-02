@@ -27,12 +27,13 @@ def run():
         CONF(args=sys.argv[1:])
 
         for worker in CONF.workers:
-            driver.DriverManager('drops.workers', worker)
+            driver.DriverManager('drops.workers',
+                                 worker,
+                                 invoke_args=[CONF])
 
-        server = rpc.Commander()
-        server.bind(CONF.listen)
+        server = rpc.Commander(CONF)
+        server.bind()
         server.run()
-
     except KeyboardInterrupt:
         fail(1, '... terminating drops worker')
     except RuntimeError as e:

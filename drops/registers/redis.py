@@ -17,21 +17,20 @@ OPTIONS = [
                help='Redis Host'),
 ]
 
-CONF = cfg.CONF
-CONF.register_opts(OPTIONS)
+cfg.CONF.register_opts(OPTIONS)
 
 
 class Redis(base.RemoteMethods):
 
     @decorators.lazy_property
     def _redis(self):
-        pool = redis.ConnectionPool(host=CONF.host,
-                                    port=CONF.port,
-                                    db=CONF.db)
+        pool = redis.ConnectionPool(host=self.conf.host,
+                                    port=self.conf.port,
+                                    db=self.conf.db)
         return redis.Redis(connection_pool=pool)
 
     def remote_store(self, name, method):
-        self._redis.set("commands:%s:%s" % (name, CONF.listen), CONF.listen)
+        self._redis.set("commands:%s:%s" % (name, self.conf.listen), self.conf.listen)
 
     def remote_lookup(self, name):
         keys = self._redis.keys("commands:%s:*" % name)

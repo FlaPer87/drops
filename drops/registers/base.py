@@ -14,13 +14,16 @@ OPTIONS = [
                help='Timeout per worker'),
 ]
 
-CONF = cfg.CONF
-CONF.register_opts(OPTIONS)
+cfg.CONF.register_opts(OPTIONS)
 
 LOG = logging.getLogger(__name__)
 
 
 class RemoteMethods(base.MethodsRegister):
+
+    def __init__(self, conf, *args, **kwargs):
+        self.conf = conf
+        super(RemoteMethods, self).__init__(*args, **kwargs)
 
     def remote_store(self, name, method):
         raise NotImplementedError
@@ -44,8 +47,8 @@ class RemoteMethods(base.MethodsRegister):
         except KeyError:
             LOG.debug("Attempting to load remote method: %s" % name)
             remote = self.remote_lookup(name)
-            client = pirate.Lazy(retries=CONF.worker_retries,
-                                 timeout=CONF.worker_timeout,
+            client = pirate.Lazy(retries=self.conf.worker_retries,
+                                 timeout=self.conf.worker_timeout,
                                  address=remote)
             method = self.remotely(client, name)
         LOG.debug("Method %s found" % method)

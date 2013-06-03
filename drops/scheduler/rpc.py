@@ -10,6 +10,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import inspect
+
 from oslo.config import cfg
 from smartrpyc import server
 from stevedore import driver
@@ -30,11 +32,31 @@ class Commander(server.Server):
 
     def __init__(self, conf, *args, **kwargs):
         self.conf = conf
-        self.register = registers.get_register()
-        kwargs.setdefault("methods", self.register)
+        self._workers = []
+        self._register = registers.get_register()
+        kwargs.setdefault("methods", self._register)
         super(Commander, self).__init__(*args, **kwargs)
 
         self._load_middleware()
+
+    def add_worker(self, worker):
+        """
+        Exports methods through the RPC Api.
+
+        :params worker: Resource's instance to register.
+        """
+
+        funcs = filter(lambda x: not x.startswith("_"), dir(worker))
+
+        for name in funcs:
+            meth = getattr(worker, name)
+
+            if not inspect.ismethod(meth):
+                continue
+
+            self._register.register(meth)
+
+        self._workers.append(worker)
 
     def bind(self):
         super(Commander, self).bind(self.conf.listen)

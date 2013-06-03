@@ -38,12 +38,15 @@ def run():
     try:
         CONF(args=sys.argv[1:])
 
-        for worker in CONF.workers:
-            driver.DriverManager('drops.workers',
-                                 worker,
-                                 invoke_args=[CONF])
-
         server = rpc.Commander(CONF)
+
+        for worker in CONF.workers:
+            worker = driver.DriverManager('drops.workers',
+                                          worker,
+                                          invoke_on_load=True,
+                                          invoke_args=[CONF])
+            server.add_worker(worker.driver)
+
         server.bind()
         server.run()
     except KeyboardInterrupt:
